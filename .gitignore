@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Astro generated files and production output
+.astro/
+dist/
+
+# Local environment files (keep the example template if one is added later)
+.env
+.env.*
+!.env.example
+
+# Logs and local caches
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+.eslintcache
+*.tsbuildinfo
+coverage/
+
+# Operating-system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor metadata
+.idea/
+.vscode/

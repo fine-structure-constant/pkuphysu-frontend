@@ -1,0 +1,26 @@
+---
+import TagChip from "../common/TagChip.astro";
+---
+<aside class="widget-column" aria-label="站点信息">
+  <section class="widget-card widget-card--profile glass-panel">
+    <div class="widget-card__top"><span class="widget-label">ABOUT THE UNION</span><span class="widget-index">01</span></div>
+    <div class="widget-profile"><img src="/assets/PKU.svg" alt="北京大学校徽" /><div><strong>物理学院学生会</strong><span>探索 · 连接 · 行动</span></div></div>
+    <p>一个由学生共同维护的开放空间。具体成员与联系方式将在正式数据接入后更新。</p>
+    <a class="text-link" href="/about">了解更多 <span aria-hidden="true">↗</span></a>
+  </section>
+  <section class="widget-card glass-panel">
+    <div class="widget-card__top"><span class="widget-label">UP NEXT</span><span class="widget-index">02</span></div>
+    <div class="event-date"><strong>18</strong><span>SEP<br />2026</span></div>
+    <h3>学生会开放日</h3><p class="muted">理科一号楼 · 地点待确认</p>
+    <div class="event-progress"><span style="width: 68%"></span></div><small>准备中 · mock event</small>
+  </section>
+  <section class="widget-card glass-panel">
+    <div class="widget-card__top"><span class="widget-label">QUICK LINKS</span><span class="widget-index">03</span></div>
+    <nav class="quick-links" aria-label="快捷入口"><a href="/forum" data-route-gate="/forum" hidden><span>论坛讨论</span><b>→</b></a><a href="/archive" data-route-gate="/archive" hidden><span>内容归档</span><b>→</b></a><a href="/about"><span>加入我们</span><b>→</b></a></nav>
+  </section>
+  <section class="widget-card widget-card--stats glass-panel">
+    <div class="widget-card__top"><span class="widget-label">A SMALL SIGNAL</span><span class="widget-index">04</span></div>
+    <div class="stats-number">24<span>+</span></div><p>本学期留下的讨论与记录</p>
+    <div class="stats-tags"><TagChip label="课程" /><TagChip label="校园" /><TagChip label="实验室" /></div>
+  </section>
+</aside>

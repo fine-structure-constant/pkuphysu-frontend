@@ -1,0 +1,91 @@
+---
+import PublicLayout from "../layouts/PublicLayout.astro";
+---
+
+<PublicLayout title="公众号" currentPath="/official_account" description="物院学生会微信公众号文章归档。">
+  <div class="page-wrap official-account-page">
+    <section class="official-account-hero glass-panel glass-panel--strong">
+      <div>
+        <p class="eyebrow">OFFICIAL ACCOUNT</p>
+        <h1>微信公众号文章</h1>
+        <p>集中展示物院学生会公众号已抓取的公开文章。文章标题、摘要、来源和发布时间来自后端元数据。</p>
+      </div>
+      <div class="official-account-mark" aria-hidden="true">W</div>
+    </section>
+    <div class="official-account-toolbar">
+      <div><strong>物院学生会</strong><span data-official-count>正在读取文章</span></div>
+      <button class="console-secondary-button" type="button" data-official-refresh>刷新</button>
+    </div>
+    <div class="official-account-list" data-official-list aria-live="polite">
+      <div class="official-account-loading glass-panel">正在从后端读取公众号文章……</div>
+    </div>
+    <div class="official-account-empty glass-panel" data-official-empty hidden>
+      <strong>暂无已抓取文章</strong>
+      <p>管理员可以在控制台的 WeChat 模块中扫码登录并更新文章。</p>
+    </div>
+  </div>
+</PublicLayout>
+
+<script>
+  import { apiJson } from "../lib/api";
+
+  const list = document.querySelector<HTMLElement>("[data-official-list]");
+  const empty = document.querySelector<HTMLElement>("[data-official-empty]");
+  const count = document.querySelector<HTMLElement>("[data-official-count]");
+  const refresh = document.querySelector<HTMLButtonElement>("[data-official-refresh]");
+  type OfficialArticle = { id: number; title: string; description: string; mp_name: string; url: string; publish_time: string; tag: string; author?: string; cover_url?: string };
+
+  const createText = (tag: string, text: string, className?: string) => {
+    const element = document.createElement(tag);
+    if (className) element.className = className;
+    element.textContent = text;
+    return element;
+  };
+
+  const renderArticles = (articles: OfficialArticle[]) => {
+    if (!list || !empty) return;
+    list.replaceChildren();
+    count && (count.textContent = `${articles.length} 篇已归档`);
+    empty.hidden = articles.length > 0;
+    articles.forEach((article) => {
+      const card = document.createElement("article");
+      card.className = "official-article glass-panel";
+      const cover = document.createElement("div");
+      cover.className = "official-article__cover";
+      if (article.cover_url) cover.style.backgroundImage = `linear-gradient(180deg, rgba(16, 29, 52, 0.05), rgba(16, 29, 52, 0.55)), url(${JSON.stringify(article.cover_url)})`;
+      cover.append(createText("span", article.cover_url ? "首图" : "首图占位"));
+      const body = document.createElement("div");
+      body.className = "official-article__body";
+      const meta = document.createElement("div");
+      meta.className = "official-article__meta";
+      meta.append(createText("span", article.tag || "其它", "tag-chip"), createText("time", article.publish_time || "发布时间未知"));
+      const title = createText("h2", article.title || "未命名文章");
+      const description = createText("p", article.description || "暂无摘要");
+      const source = createText("small", `${article.mp_name || "物院学生会"}${article.author ? ` · ${article.author}` : ""}`);
+      const link = document.createElement("a");
+      link.className = "text-link official-article__link";
+      link.href = article.url;
+      link.target = "_blank";
+      link.rel = "noreferrer";
+      link.append("阅读原文 ↗");
+      body.append(meta, title, description, source, link);
+      card.append(cover, body);
+      list.append(card);
+    });
+  };
+
+  const loadArticles = async () => {
+    if (!list || !empty) return;
+    list.replaceChildren(createText("div", "正在从后端读取公众号文章……", "official-account-loading glass-panel"));
+    try {
+      const result = await apiJson<OfficialArticle[]>("/wechat/posts?limit=100&page=1");
+      renderArticles(result.data || []);
+    } catch {
+      list.replaceChildren(createText("div", "公众号文章读取失败，请稍后重试。", "official-account-loading glass-panel"));
+      count && (count.textContent = "暂时无法连接后端");
+    }
+  };
+
+  refresh?.addEventListener("click", () => { void loadArticles(); });
+  void loadArticles();
+</script>

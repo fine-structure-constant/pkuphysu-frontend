@@ -1,0 +1,28 @@
+---
+import PublicLayout from "../../layouts/PublicLayout.astro";
+import TagChip from "../../components/common/TagChip.astro";
+import SectionHeading from "../../components/common/SectionHeading.astro";
+import { articles } from "../../mocks/articles";
+
+export function getStaticPaths() {
+  return articles.map((article) => ({ params: { slug: article.slug }, props: { article } }));
+}
+
+const { article } = Astro.props;
+---
+<PublicLayout title={article.title} currentPath="/articles">
+  <div class="page-wrap article-detail-page">
+    <a class="back-link" href="/articles">← 返回文章列表</a>
+    <article class="article-detail glass-panel glass-panel--strong">
+      <header class="article-detail__header">
+        <div class="article-row__meta"><span class="article-row__category">{article.category}</span><span>{article.publishedAt.replaceAll("-", ".")}</span>{article.pinned && <span class="article-row__pin">置顶</span>}</div>
+        <h1>{article.title}</h1><p>{article.excerpt}</p>
+        <div class="tag-list">{article.tags.map((tag) => <TagChip label={tag} />)}<span class="article-detail__read">阅读时间 {article.readTime}</span></div>
+      </header>
+      {article.cover && <div class="article-detail__cover"><img src={article.cover} alt="文章占位封面" /></div>}
+      <div class="article-detail__body">{article.body.map((paragraph) => <p>{paragraph}</p>)}</div>
+      <footer class="article-detail__footer"><span>本文是可替换的本地 mock 内容</span><a class="text-link" href="/forum">在论坛里讨论 <span aria-hidden="true">↗</span></a></footer>
+    </article>
+    <SectionHeading eyebrow="KEEP EXPLORING" title="也许你还会喜欢" actionLabel="返回文章" actionHref="/articles" />
+  </div>
+</PublicLayout>

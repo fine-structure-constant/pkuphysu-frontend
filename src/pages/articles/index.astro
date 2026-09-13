@@ -1,0 +1,38 @@
+---
+import PublicLayout from "../../layouts/PublicLayout.astro";
+import SectionHeading from "../../components/common/SectionHeading.astro";
+import ArticleRow from "../../components/home/ArticleRow.astro";
+import { articles } from "../../mocks/articles";
+---
+<PublicLayout title="文章" currentPath="/articles">
+  <div class="page-wrap articles-page">
+    <SectionHeading eyebrow="ARTICLES & NOTICES" title="文章与通知" description="按主题浏览学院学生会的公开记录。封面、置顶和分类都是原型状态的示例。" />
+    <div class="articles-toolbar glass-panel glass-panel--strong"><div class="filter-pills" role="group" aria-label="文章分类"><button class="filter-pill active" type="button" data-article-category="all">全部 <span>05</span></button><button class="filter-pill" type="button" data-article-category="通知">通知</button><button class="filter-pill" type="button" data-article-category="活动">活动</button><button class="filter-pill" type="button" data-article-category="观察">观察</button><button class="filter-pill" type="button" data-article-category="社团">社团</button></div><label class="search-field search-field--small"><span aria-hidden="true">⌕</span><input type="search" placeholder="搜索文章" aria-label="搜索文章" data-article-search /></label></div>
+    <div class="articles-grid" data-articles-grid>{articles.map((article) => <ArticleRow article={article} />)}</div>
+    <div class="archive-empty" data-articles-empty hidden><p class="empty-inline">没有找到对应文章。这里的内容来自本地 mock fixtures。</p></div>
+  </div>
+</PublicLayout>
+<script>
+  const articleSearch = document.querySelector('[data-article-search]') as HTMLInputElement | null;
+  const articleButtons = document.querySelectorAll('[data-article-category]');
+  const articleRows = [...document.querySelectorAll<HTMLElement>('[data-articles-grid] .article-row')];
+  const articleEmpty = document.querySelector('[data-articles-empty]') as HTMLElement | null;
+  let articleCategory = 'all';
+  const applyArticleFilter = () => {
+    const query = articleSearch?.value.trim().toLowerCase() ?? '';
+    let visible = 0;
+    articleRows.forEach((row) => {
+      const text = row.textContent?.toLowerCase() ?? '';
+      const show = (articleCategory === 'all' || text.includes(articleCategory)) && (!query || text.includes(query));
+      row.hidden = !show;
+      if (show) visible += 1;
+    });
+    if (articleEmpty) articleEmpty.hidden = visible > 0;
+  };
+  articleSearch?.addEventListener('input', applyArticleFilter);
+  articleButtons.forEach((button) => button.addEventListener('click', () => {
+    articleCategory = button.getAttribute('data-article-category') ?? 'all';
+    articleButtons.forEach((item) => item.classList.toggle('active', item === button));
+    applyArticleFilter();
+  }));
+</script>

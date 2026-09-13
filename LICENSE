@@ -1,0 +1,12 @@
+                    GNU GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
+
+ Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+
+This project is distributed under the GNU General Public License v3.0.
+See <https://www.gnu.org/licenses/> for the complete license text.
+
+The application code in this repository is newly written for the PKUPHYSU
+frontend prototype. Reference projects are not copied into this repository.

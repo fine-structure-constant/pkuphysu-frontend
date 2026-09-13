@@ -1,0 +1,56 @@
+---
+import PublicLayout from "../layouts/PublicLayout.astro";
+import SectionHeading from "../components/common/SectionHeading.astro";
+import ArticleRow from "../components/home/ArticleRow.astro";
+import EmptyState from "../components/common/EmptyState.astro";
+import { archiveGroups } from "../mocks/articles";
+---
+<PublicLayout title="归档" currentPath="/archive">
+  <div class="page-wrap archive-page">
+    <SectionHeading eyebrow="ARCHIVE" title="按时间找到过去" description="一份静态时间线，记录学生会公开内容的 mock 版本。" />
+    <div class="archive-toolbar glass-panel glass-panel--strong">
+      <label class="search-field"><span aria-hidden="true">⌕</span><input type="search" placeholder="搜索标题或标签" aria-label="搜索归档" data-archive-search /></label>
+      <div class="filter-pills" role="group" aria-label="归档分类"><button class="filter-pill active" type="button" data-category="all">全部</button><button class="filter-pill" type="button" data-category="通知">通知</button><button class="filter-pill" type="button" data-category="活动">活动</button><button class="filter-pill" type="button" data-category="观察">观察</button></div>
+    </div>
+    <div class="archive-list" data-archive-list>
+      {archiveGroups.map((group) => <section class="archive-year"><div class="archive-year__label"><strong>{group.year}</strong><span>YEAR</span></div><div class="archive-months">{group.months.map((month) => <div class="archive-month"><h2>{month.label}<span>{month.articles.length.toString().padStart(2, "0")}</span></h2><div class="archive-rows">{month.articles.map((article) => <ArticleRow article={article} compact />)}</div></div>)}</div></section>)}
+      <div class="archive-empty" data-archive-empty hidden><EmptyState title="没有匹配内容" description="换一个关键词或清除分类筛选试试。" /></div>
+    </div>
+  </div>
+</PublicLayout>
+<script>
+  import { apiJson, ApiError } from "../lib/api";
+  import { clearAuthSession, getAuthSession } from "../lib/session";
+
+  const requireMember = async () => {
+    if (!getAuthSession()?.token) { window.location.replace(`/login?next=${encodeURIComponent(window.location.pathname)}`); return; }
+    try { await apiJson('/auth/member-authorized'); }
+    catch (error) { if (error instanceof ApiError && error.status === 401) clearAuthSession(); window.location.replace(`/login?next=${encodeURIComponent(window.location.pathname)}`); }
+  };
+  void requireMember();
+
+  const search = document.querySelector('[data-archive-search]') as HTMLInputElement | null;
+  const filterButtons = document.querySelectorAll('[data-category]');
+  const rows = [...document.querySelectorAll<HTMLElement>('[data-archive-list] .article-row')];
+  const empty = document.querySelector('[data-archive-empty]') as HTMLElement | null;
+  let category = 'all';
+  const filterRows = () => {
+    const query = search?.value.trim().toLowerCase() ?? '';
+    let visible = 0;
+    rows.forEach((row) => {
+      const text = row.textContent?.toLowerCase() ?? '';
+      const matchesQuery = !query || text.includes(query);
+      const matchesCategory = category === 'all' || text.includes(category);
+      const show = matchesQuery && matchesCategory;
+      row.hidden = !show;
+      if (show) visible += 1;
+    });
+    if (empty) empty.hidden = visible > 0;
+  };
+  search?.addEventListener('input', filterRows);
+  filterButtons.forEach((button) => button.addEventListener('click', () => {
+    category = button.getAttribute('data-category') ?? 'all';
+    filterButtons.forEach((item) => item.classList.toggle('active', item === button));
+    filterRows();
+  }));
+</script>

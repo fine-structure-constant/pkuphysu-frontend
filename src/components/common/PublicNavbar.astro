@@ -1,0 +1,157 @@
+---
+interface Props {
+  currentPath?: string;
+}
+
+const { currentPath = Astro.url.pathname } = Astro.props;
+const links = [
+  { label: "首页", href: "/" },
+  { label: "归档", href: "/archive", gated: true },
+  { label: "关于", href: "/about" },
+  { label: "文章", href: "/articles" },
+  { label: "公众号", href: "/official_account" },
+  { label: "论坛", href: "/forum", gated: true },
+  { label: "控制台", href: "/console", gated: true },
+];
+---
+<header class="public-navbar" data-navbar>
+  <div class="page-wrap public-navbar__inner">
+    <div class="public-navbar__identity">
+      <a class="brand" href="/" aria-label="PKUPHYSU 首页">
+        <span class="brand__seal"><img src="/assets/PKU.svg" alt="" /></span>
+        <span class="brand__words"><strong>PKUPHYSU</strong><small>物理学院学生会</small></span>
+      </a>
+      <a class="public-user-card" data-user-card href="/login" hidden aria-label="打开个人中心">
+        <span class="public-user-card__avatar" data-user-avatar aria-hidden="true"><span data-user-initials>U</span><img data-user-avatar-image alt="" hidden /></span>
+        <span class="public-user-card__copy"><strong data-user-name>用户</strong><small data-user-role>普通用户</small></span>
+      </a>
+    </div>
+    <nav class="public-navbar__links" aria-label="主导航">
+      {links.map((link) => (
+        <a class:list={["public-navbar__link", { active: currentPath === link.href || (link.href !== "/" && currentPath.startsWith(link.href)) }]} href={link.href} aria-current={currentPath === link.href || (link.href !== "/" && currentPath.startsWith(link.href)) ? "page" : undefined} data-route-gate={link.gated ? link.href : undefined} hidden={link.gated}>
+          {link.label}
+        </a>
+      ))}
+    </nav>
+    <div class="public-navbar__actions">
+      <a class="public-login-link" data-login-link href="/login">登录 <span aria-hidden="true">↗</span></a>
+      <button class="icon-button" type="button" data-theme-toggle aria-label="切换主题" title="切换主题">
+        <span data-theme-icon="light"><span class="icon-slot">☼</span></span>
+        <span data-theme-icon="dark" hidden><span class="icon-slot">☾</span></span>
+      </button>
+      <button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="mobile-menu" aria-label="打开导航菜单">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu" data-mobile-menu hidden>
+    <nav class="page-wrap mobile-menu__inner" aria-label="移动端主导航">
+      {links.map((link) => (
+        <a class:list={["mobile-menu__link", { active: currentPath === link.href || (link.href !== "/" && currentPath.startsWith(link.href)) }]} href={link.href} aria-current={currentPath === link.href || (link.href !== "/" && currentPath.startsWith(link.href)) ? "page" : undefined} data-route-gate={link.gated ? link.href : undefined} hidden={link.gated}>
+          <span>{link.label}</span><span aria-hidden="true">↗</span>
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
+<script>
+  import { apiJson, ApiError } from "../../lib/api";
+  import { canAccessPath, clearAuthSession, getAuthSession, getInitials, roleLabel, updateStoredUser } from "../../lib/session";
+
+  const root = document.documentElement;
+  const themeToggle = document.querySelector('[data-theme-toggle]');
+  const menuToggle = document.querySelector('[data-menu-toggle]') as HTMLButtonElement | null;
+  const mobileMenu = document.querySelector('[data-mobile-menu]') as HTMLElement | null;
+
+  const renderAuthState = () => {
+    const session = getAuthSession();
+    document.querySelectorAll<HTMLElement>('[data-route-gate]').forEach((element) => {
+      const path = element.getAttribute('data-route-gate') ?? '';
+      element.hidden = !canAccessPath(session?.user.role, path);
+    });
+
+    const userCard = document.querySelector<HTMLAnchorElement>('[data-user-card]');
+    const loginLink = document.querySelector<HTMLElement>('[data-login-link]');
+    const userName = document.querySelector<HTMLElement>('[data-user-name]');
+    const userRole = document.querySelector<HTMLElement>('[data-user-role]');
+    const userInitials = document.querySelector<HTMLElement>('[data-user-initials]');
+    const userAvatar = document.querySelector<HTMLImageElement>('[data-user-avatar-image]');
+    const authCta = document.querySelector<HTMLAnchorElement>('[data-auth-cta]');
+    const authCtaLabel = document.querySelector<HTMLElement>('[data-auth-cta-label]');
+    if (!userCard || !loginLink || !userName || !userRole || !userInitials || !userAvatar) return;
+
+    if (session) {
+      userCard.hidden = false;
+      loginLink.hidden = true;
+      userCard.href = '/usr';
+      userName.textContent = session.user.username;
+      userRole.textContent = roleLabel(session.user.role);
+      userInitials.textContent = getInitials(session.user.username);
+      userAvatar.hidden = !session.user.id;
+      if (session.user.id) userAvatar.src = `/user/avatar/${session.user.id}`;
+      userAvatar.onerror = () => { userAvatar.hidden = true; };
+      if (authCta && authCtaLabel) { authCta.href = '/usr'; authCtaLabel.textContent = '个人中心'; }
+    } else {
+      userCard.hidden = true;
+      loginLink.hidden = false;
+      if (authCta && authCtaLabel) { authCta.href = '/login'; authCtaLabel.textContent = '登录'; }
+    }
+  };
+
+  const syncAuthState = async () => {
+    const session = getAuthSession();
+    if (!session?.token) return;
+    try {
+      const response = await apiJson<Record<string, unknown>>('/user/me');
+      updateStoredUser(response.data);
+      renderAuthState();
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) clearAuthSession();
+    }
+  };
+
+  const updateThemeIcon = () => {
+    const dark = root.dataset.theme === 'dark';
+    document.querySelector('[data-theme-icon="light"]')?.toggleAttribute('hidden', dark);
+    document.querySelector('[data-theme-icon="dark"]')?.toggleAttribute('hidden', !dark);
+    themeToggle?.setAttribute('aria-label', dark ? '切换到浅色主题' : '切换到深色主题');
+  };
+
+  themeToggle?.addEventListener('click', () => {
+    root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('pkuphysu-theme', root.dataset.theme);
+    updateThemeIcon();
+  });
+
+  const closeMenu = () => {
+    if (!mobileMenu || !menuToggle) return;
+    mobileMenu.hidden = true;
+    menuToggle.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('menu-open');
+    menuToggle.focus();
+  };
+
+  menuToggle?.addEventListener('click', () => {
+    if (!mobileMenu || !menuToggle) return;
+    const open = mobileMenu.hidden;
+    mobileMenu.hidden = !open;
+    menuToggle.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
+    if (open) mobileMenu.querySelector('a')?.focus();
+    else closeMenu();
+  });
+
+  mobileMenu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeMenu();
+  });
+
+  try {
+    const savedTheme = localStorage.getItem('pkuphysu-theme');
+    if (savedTheme === 'dark') root.dataset.theme = 'dark';
+  } catch { /* localStorage can be unavailable in privacy modes */ }
+  updateThemeIcon();
+  renderAuthState();
+  void syncAuthState();
+  window.addEventListener('pkuphysu-auth-change', renderAuthState);
+</script>

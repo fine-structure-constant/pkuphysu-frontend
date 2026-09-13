@@ -1,0 +1,53 @@
+---
+import ConsoleApp from "../../islands/ConsoleApp.vue";
+import "../../styles/global.css";
+
+export function getStaticPaths() {
+  return [
+    undefined,
+    "dashboard",
+    "content/articles",
+    "content/posts",
+    "content/comments",
+    "content/reports",
+    "attachments",
+    "users",
+    "appearance/menus",
+    "appearance/themes",
+    "system/settings",
+    "system/tools",
+    "database/tables",
+    "database/migrations",
+    "wechat",
+  ].map((path) => ({ params: { path } }));
+}
+
+const initialPath = Astro.url.pathname;
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content="PKUPHYSU 学生会控制台前端原型" />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <title>控制台 · PKUPHYSU</title>
+    <style is:inline>
+      body.console-entry { visibility: hidden; }
+      body.console-entry.console-auth-ready { visibility: visible; }
+    </style>
+    <script is:inline>
+      (() => {
+        try {
+          const token = localStorage.getItem("pkuphysu-token") || localStorage.getItem("user_token");
+          if (!token) window.location.replace(`/login?next=${encodeURIComponent(window.location.pathname)}`);
+        } catch {
+          window.location.replace(`/login?next=${encodeURIComponent(window.location.pathname)}`);
+        }
+      })();
+    </script>
+  </head>
+  <body class="console-entry">
+    <ConsoleApp client:load initialPath={initialPath} />
+  </body>
+</html>

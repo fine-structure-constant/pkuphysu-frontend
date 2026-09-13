@@ -1,0 +1,23 @@
+---
+import PublicLayout from "../layouts/PublicLayout.astro";
+import SectionHeading from "../components/common/SectionHeading.astro";
+---
+<PublicLayout title="关于" currentPath="/about">
+  <div class="page-wrap about-page">
+    <SectionHeading eyebrow="ABOUT PKUPHYSU" title="让学生的声音，成为校园的一部分" description="这是物理学院学生会网站的新一代前端原型。我们先把信息架构和阅读体验搭好，再等待正式内容抵达。" />
+    <div class="about-grid">
+      <article class="about-story glass-panel glass-panel--strong">
+        <p class="about-lead">学生会不只是一个组织名称，也是一种把‘我有个想法’变成‘我们来试试’的协作方式。</p>
+        <p>我们关心课堂之外的学习：一次对实验的好奇、一场跨年级的讨论、一份让新同学更快熟悉校园的路线。网站会把这些公开内容放在一个清晰、可回看的空间里。</p>
+        <p>目前页面展示的是前端 milestone-one 原型。成员、部门、地址与联系方式均未填入真实信息，正式版本会在获得授权后由内容维护者更新。</p>
+        <div class="about-quote"><span>“</span><p>先把问题说出来，答案才有机会被一起找到。</p></div>
+      </article>
+      <aside class="about-facts">
+        <div class="fact-card glass-panel"><span class="widget-label">CURRENT STATUS</span><strong>开放式原型</strong><p>本地 mock data<br />无网络请求 · 可继续扩展</p></div>
+        <div class="fact-card glass-panel"><span class="widget-label">OUR PRINCIPLES</span><ul><li>清晰比热闹更重要</li><li>公开内容保持可回溯</li><li>让每个人都能参与</li></ul></div>
+      </aside>
+    </div>
+    <section class="about-timeline" aria-labelledby="timeline-title"><div class="timeline-heading"><p class="eyebrow">A SMALL TIMELINE</p><h2 id="timeline-title">从一次讨论开始</h2></div><div class="timeline-items"><div><span>01</span><strong>收集问题</strong><p>从课堂、实验室和日常校园生活里发现真实需求。</p></div><div><span>02</span><strong>一起整理</strong><p>把分散的想法变成任何人都能读懂的内容。</p></div><div><span>03</span><strong>公开发生</strong><p>在论坛与文章中留下记录，等待下一位参与者。</p></div></div></section>
+    <section class="contact-card glass-panel"><div><p class="eyebrow">CONTACT PLACEHOLDER</p><h2>想一起做点什么？</h2><p>联系方式和正式招募入口将在内容服务接入后补充。现在可以先从论坛里留下一个问题。</p></div><a class="action-button" href="/forum">去论坛看看 <span aria-hidden="true">↗</span></a></section>
+  </div>
+</PublicLayout>

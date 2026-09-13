@@ -1,0 +1,27 @@
+---
+import PublicNavbar from "../components/common/PublicNavbar.astro";
+import PublicFooter from "../components/common/PublicFooter.astro";
+import "../styles/global.css";
+
+interface Props { title: string; description?: string; currentPath?: string; home?: boolean; }
+const { title, description = "北京大学物理学院学生会的开放式校园信息与交流空间。", currentPath, home = false } = Astro.props;
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg" />
+    <title>{title} · PKUPHYSU</title>
+    <script is:inline>
+      try { if (localStorage.getItem('pkuphysu-theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch {}
+    </script>
+  </head>
+  <body class:list={{ "is-home": home }}>
+    <div class="site-backdrop" aria-hidden="true"></div>
+    <PublicNavbar currentPath={currentPath} />
+    <main>{home ? <slot /> : <div class="public-page"><slot /></div>}</main>
+    <PublicFooter />
+  </body>
+</html>

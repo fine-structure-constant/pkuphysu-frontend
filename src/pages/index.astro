@@ -1,0 +1,22 @@
+---
+import PublicLayout from "../layouts/PublicLayout.astro";
+import Hero from "../components/home/Hero.astro";
+import ArticleRow from "../components/home/ArticleRow.astro";
+import WidgetColumn from "../components/home/WidgetColumn.astro";
+import SectionHeading from "../components/common/SectionHeading.astro";
+import { articles } from "../mocks/articles";
+---
+<PublicLayout title="首页" home currentPath="/">
+  <Hero />
+  <section class="page-wrap home-content" aria-label="首页内容">
+    <div class="home-grid">
+      <section class="home-main glass-panel glass-panel--strong">
+        <SectionHeading eyebrow="LATEST NOTES" title="最近的记录" description="公告、活动与一些值得被留下来的观察。内容来自本地 mock fixtures。" actionLabel="查看全部" actionHref="/articles" />
+        <div class="article-list">
+          {articles.slice(0, 3).map((article) => <ArticleRow article={article} />)}
+        </div>
+      </section>
+      <WidgetColumn />
+    </div>
+  </section>
+</PublicLayout>

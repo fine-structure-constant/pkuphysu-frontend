@@ -1,0 +1,15 @@
+---
+import TagChip from "../common/TagChip.astro";
+import type { Article } from "../../types";
+interface Props { article: Article; compact?: boolean; }
+const { article, compact = false } = Astro.props;
+---
+<a class:list={["article-row", { "article-row--compact": compact }]} href={`/articles/${article.slug}`}>
+  {article.cover && !compact ? <div class="article-row__cover"><img src={article.cover} alt="" loading="lazy" /></div> : null}
+  <div class="article-row__body">
+    <div class="article-row__meta"><span class="article-row__category">{article.category}</span><span>{article.publishedAt.replaceAll("-", ".")}</span>{article.pinned && <span class="article-row__pin">置顶</span>}</div>
+    <h3>{article.title}</h3>
+    {!compact && <p>{article.excerpt}</p>}
+    <div class="article-row__foot"><div class="tag-list">{article.tags.map((tag) => <TagChip label={tag} />)}</div><span>{article.readTime} <span aria-hidden="true">↗</span></span></div>
+  </div>
+</a>
