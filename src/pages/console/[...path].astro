@@ -22,7 +22,8 @@ export function getStaticPaths() {
   ].map((path) => ({ params: { path } }));
 }
 
-const initialPath = Astro.url.pathname;
+const pathParam = Astro.params.path;
+const initialPath = pathParam ? `/console/${pathParam}` : "/console";
 ---
 <!doctype html>
 <html lang="zh-CN">

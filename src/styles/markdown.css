@@ -53,3 +53,6 @@
 .forum-markdown--comment { color: var(--text-muted); font-size: 0.72rem; line-height: 1.55; }
 .forum-markdown--comment p { margin: 0.25rem 0 0; }
 .forum-markdown--comment pre { padding: 0.5rem 0.6rem; }
+.forum-markdown--comment-preview { display: -webkit-box; max-height: 2.8rem; overflow: hidden; color: var(--text-muted); font-size: 0.71rem; line-height: 1.45; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.forum-markdown--comment-preview p { margin: 0; }
+.forum-markdown--comment-preview pre, .forum-markdown--comment-preview img, .forum-markdown--comment-preview table { display: none; }
